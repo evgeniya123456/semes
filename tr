@@ -61,3 +61,91 @@ def _calculate_coordinates(self):
                 self.is_running = False
                 print("Час вичерпано!")
                 self.flip()
+
+def _update_sand_display(self):
+        cx, top_y, sq = self._calculate_coordinates()
+        padding = 10
+        max_height = sq - 2 * padding
+        width_factor = sq // 2 - padding
+
+        # Верхній пісок (звужується донизу)
+        remaining = self.sand_level
+        upper_height = int(remaining * max_height)
+        top_base = int(width_factor * remaining)
+        self.coords(self.upper_sand,
+                    cx - top_base, top_y + padding,
+                    cx + top_base, top_y + padding,
+                    cx + 2, top_y + padding + upper_height,
+                    cx - 2, top_y + padding + upper_height)
+
+        # Нижній пісок (наростає як купка)
+        lower_height = int((1 - self.sand_level) * max_height)
+        base = int(width_factor * (1 - self.sand_level))
+        bottom = top_y + 2 * sq - padding
+        self.coords(self.lower_sand,
+                    cx - base, bottom,
+                    cx + base, bottom,
+                    cx, bottom - lower_height)
+
+        # Сипучий пісок (струмінь)
+        if 0 < self.sand_level < 1.0:
+            top_sand_y = top_y + padding + upper_height
+            bottom_sand_y = bottom - lower_height
+            self.coords(self.falling_sand,
+                        cx - 1, top_sand_y,
+                        cx + 1, bottom_sand_y)
+            self.itemconfigure(self.falling_sand, state='normal')
+        else:
+            self.itemconfigure(self.falling_sand, state='hidden')
+
+    def start(self):
+        if not self.is_running:
+            self.is_running = True
+            self.start_time = time.time()
+            self._animate_sand()
+
+    def reset(self):
+        self.is_running = False
+        if self.timer_id is not None:
+            self.after_cancel(self.timer_id)
+            self.timer_id = None
+        self.sand_level = 1.0
+        self._update_sand_display()
+
+    def set_duration(self, new_duration):
+        try:
+            self.duration = int(new_duration)
+            if self.is_running:
+                self.reset()
+                self.start()
+        except ValueError:
+            print("Будь ласка, введіть ціле число для тривалості.")
+
+    def _on_resize(self, event):
+        self._create_sand_clock()
+        self._update_sand_display()
+
+    def flip(self):
+        """Перевертає пісочний годинник і починає новий відлік"""
+        self.reset()  # Скидаємо рівень піску
+        time.sleep(1)  # Додаємо невеликий затримку перед перевертанням
+        self.is_running = True
+        self.start_time = time.time()  # Перезапускаємо відлік
+        print("Перевернуто!")
+
+def main():
+    window = tk.Tk()
+    window.title("Пісочний годинник")
+
+    sand_clock = SandClock(window, duration=60)
+    sand_clock.pack(pady=10, expand=True, fill=tk.BOTH)
+    sand_clock.start()  # Автоматичний запуск таймера
+
+    button_frame = tk.Frame(window)
+    button_frame.pack()
+
+    start_button = tk.Button(button_frame, text="Старт", command=sand_clock.start)
+    start_button.pack(side=tk.LEFT, padx=5)
+
+    reset_button = tk.Button(button_frame, text="Скинути", command=sand_clock.reset)
+    reset_button.pack(side=tk.LEFT, padx=5)
