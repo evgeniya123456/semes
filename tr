@@ -39,3 +39,25 @@ def _calculate_coordinates(self):
             cx - 10, top_y + sq
         ]
         self.create_polygon(frame_points, outline=self.frame_color, fill=self.glass_color, width=2, tags="glass")
+# Верхній пісок
+        self.upper_sand = self.create_polygon(0, 0, 0, 0, 0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+
+        # Нижній пісок
+        self.lower_sand = self.create_polygon(0, 0, 0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+
+        # Сипучий пісок (струмінь)
+        self.falling_sand = self.create_rectangle(0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+
+    def _animate_sand(self):
+        if self.is_running:
+            elapsed = time.time() - self.start_time
+            if elapsed < self.duration:
+                self.sand_level = 1 - (elapsed / self.duration)  # Відлік назад
+                self._update_sand_display()
+                self.timer_id = self.after(50, self._animate_sand)
+            else:
+                self.sand_level = 0.0
+                self._update_sand_display()
+                self.is_running = False
+                print("Час вичерпано!")
+                self.flip()
