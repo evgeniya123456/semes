@@ -1,0 +1,17 @@
+import tkinter as tk
+import time
+
+class SandClock(tk.Canvas):
+    def __init__(self, master, duration=60, sand_color="#FFD700", glass_color="#F0F8FF", frame_color="#8B4513", **kwargs):
+        super().__init__(master, width=150, height=300, highlightthickness=0, **kwargs)
+        self.duration = duration
+        self.sand_color = sand_color
+        self.glass_color = glass_color
+        self.frame_color = frame_color
+        self.sand_level = 0.0
+        self.is_running = False
+        self.start_time = 0
+        self.timer_id = None
+        self.bind("<Configure>", self._on_resize)
+        self._create_sand_clock()
+        self._animate_sand()
