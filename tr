@@ -149,3 +149,20 @@ def main():
 
     reset_button = tk.Button(button_frame, text="Скинути", command=sand_clock.reset)
     reset_button.pack(side=tk.LEFT, padx=5)
+
+    duration_frame = tk.Frame(window)
+    duration_frame.pack(pady=5)
+    duration_label = tk.Label(duration_frame, text="Час (сек):")
+    duration_label.pack(side=tk.LEFT)
+    duration_entry = tk.Entry(duration_frame, width=5)
+    duration_entry.insert(0, "60")
+    duration_entry.pack(side=tk.LEFT)
+
+    set_duration_button = tk.Button(duration_frame, text="Встановити",
+                                    command=lambda: sand_clock.set_duration(duration_entry.get()))
+    set_duration_button.pack(side=tk.LEFT, padx=5)
+
+    window.mainloop()
+
+if __name__ == "__main__":
+    main()
