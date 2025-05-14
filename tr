@@ -14,4 +14,28 @@ class SandClock(tk.Canvas):
         self.timer_id = None
         self.bind("<Configure>", self._on_resize)
         self._create_sand_clock()
-        self._animate_sand()
+        self._animate_sand() 
+
+def _calculate_coordinates(self):
+        square_size = 80
+        canvas_width = self.winfo_width()
+        canvas_height = self.winfo_height()
+        center_x = canvas_width // 2
+        top_y = (canvas_height - 2 * square_size) // 2
+        return center_x, top_y, square_size
+
+    def _create_sand_clock(self):
+        self.delete("all")
+        cx, top_y, sq = self._calculate_coordinates()
+        half_sq = sq // 2
+
+        # Рамка пісочного годинника
+        frame_points = [
+            cx - half_sq, top_y,
+            cx + half_sq, top_y,
+            cx + 10, top_y + sq,
+            cx + half_sq, top_y + 2 * sq,
+            cx - half_sq, top_y + 2 * sq,
+            cx - 10, top_y + sq
+        ]
+        self.create_polygon(frame_points, outline=self.frame_color, fill=self.glass_color, width=2, tags="glass")
