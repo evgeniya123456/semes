@@ -74,21 +74,7 @@ class SandClock(tk.Canvas):
                          cx + post_offset, top_y + height - disk_height // 2,  
                          fill="#3B0E05", width=post_width)  
 
-        # Скляна посудина  
-        self.create_polygon(  
-            cx - half_sq + 10, top_y + disk_height,  
-            cx + half_sq - 10, top_y + disk_height,  
-            cx + 5, top_y + sq,  
-            cx + half_sq - 10, top_y + height - disk_height,  
-            cx - half_sq + 10, top_y + height - disk_height,  
-            cx - 5, top_y + sq,  
-            fill=self.glass_color, outline="#ADD8E6", width=1.5, smooth=True  
-        )  
-
-        # Мітки для піску  
-        self.upper_sand = None  
-        self.lower_sand = None  
-        self.falling_sand = None  
+       
 
     def _animate_sand(self):  
         if self.is_running:  
