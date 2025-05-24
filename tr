@@ -161,32 +161,7 @@ class SandClock(tk.Canvas):
                 fill=self.sand_color, outline="", tags="sand"
             )
 
-    def start(self):  
-        if not self.is_running:  
-            self.is_running = True  
-            self.start_time = time.time()  
-            self._animate_sand()  
-
-    def reset(self):  
-        self.is_running = False  
-        if self.timer_id is not None:  
-            self.after_cancel(self.timer_id)  
-            self.timer_id = None  
-        self.sand_level = 1.0  
-        self._update_sand_display()  
-
-    def set_duration(self, new_duration):  
-        try:  
-            self.duration = int(new_duration)  
-            if self.is_running:  
-                self.reset()  
-                self.start()  
-        except ValueError:  
-            print("Будь ласка, введіть ціле число для тривалості.")  
-
-    def _on_resize(self, event):  
-        self._create_sand_clock()  
-        self._update_sand_display()  
+   
 
 def main():  
     window = tk.Tk()  
