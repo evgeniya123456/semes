@@ -24,7 +24,26 @@ class SandClock(tk.Canvas):
         height = 2 * sq
         disk_height = 15
 
-    
+     # Скляна посудина 
+        self.create_polygon(
+        cx - half_sq + 10, top_y + disk_height,
+        cx + half_sq - 10, top_y + disk_height,
+        cx + 5, top_y + sq,
+        cx + half_sq - 10, top_y + height - disk_height,
+        cx - half_sq + 10, top_y + height - disk_height,
+        cx - 5, top_y + sq,
+        fill=self.glass_color, outline="#ADD8E6", width=1.5, smooth=True
+    )
+        
+
+
+    def _calculate_coordinates(self):
+        square_size = 120 
+        canvas_width = self.winfo_width()
+        canvas_height = self.winfo_height()
+        center_x = canvas_width // 2
+        top_y = (canvas_height - 2 * square_size) // 2
+        return center_x, top_y, square_size
        
     
      
