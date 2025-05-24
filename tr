@@ -1,168 +1,227 @@
-import tkinter as tk
-import time
+import tkinter as tk  
+import time  
 
-class SandClock(tk.Canvas):
-    def __init__(self, master, duration=60, sand_color="#FFD700", glass_color="#F0F8FF", frame_color="#8B4513", **kwargs):
-        super().__init__(master, width=150, height=300, highlightthickness=0, **kwargs)
-        self.duration = duration
-        self.sand_color = sand_color
-        self.glass_color = glass_color
-        self.frame_color = frame_color
-        self.sand_level = 0.0
-        self.is_running = False
-        self.start_time = 0
-        self.timer_id = None
-        self.bind("<Configure>", self._on_resize)
-        self._create_sand_clock()
-        self._animate_sand() 
+class SandClock(tk.Canvas):  
+    def __init__(self, master, duration=60, sand_color="#f3d14d", glass_color="#F0F8FF", frame_color="#8B4513", **kwargs):  
+        super().__init__(master, width=150, height=300, highlightthickness=0, **kwargs)  
+        self.duration = duration  
+        self.sand_color = sand_color  
+        self.glass_color = glass_color  
+        self.frame_color = frame_color  
+        self.sand_level = 1.0  
+        self.is_running = False  
+        self.start_time = 0  
+        self.timer_id = None  
+        self.bind("<Configure>", self._on_resize)  
 
-def _calculate_coordinates(self):
-        square_size = 80
+        self._create_sand_clock()  
+        self._update_sand_display()  
+
+    def _create_sand_clock(self):  
+        self.delete("all")
+        cx, top_y, sq = self._calculate_coordinates()
+        half_sq = sq // 2
+        height = 2 * sq
+        disk_height = 15
+
+    
+        # Скляна посудина 
+        self.create_polygon(
+        cx - half_sq + 10, top_y + disk_height,
+        cx + half_sq - 10, top_y + disk_height,
+        cx + 5, top_y + sq,
+        cx + half_sq - 10, top_y + height - disk_height,
+        cx - half_sq + 10, top_y + height - disk_height,
+        cx - 5, top_y + sq,
+        fill=self.glass_color, outline="#ADD8E6", width=1.5, smooth=True
+    )
+        
+
+
+    def _calculate_coordinates(self):
+        square_size = 120 
         canvas_width = self.winfo_width()
         canvas_height = self.winfo_height()
         center_x = canvas_width // 2
         top_y = (canvas_height - 2 * square_size) // 2
         return center_x, top_y, square_size
+    
+     
 
-    def _create_sand_clock(self):
-        self.delete("all")
-        cx, top_y, sq = self._calculate_coordinates()
-        half_sq = sq // 2
+    def _create_sand_clock(self):  
+        self.delete("all")  
+        cx, top_y, sq = self._calculate_coordinates()  
+        half_sq = sq // 2  
+        height = 2 * sq  
+        disk_height = 15  
 
-        # Рамка пісочного годинника
-        frame_points = [
-            cx - half_sq, top_y,
-            cx + half_sq, top_y,
-            cx + 10, top_y + sq,
-            cx + half_sq, top_y + 2 * sq,
-            cx - half_sq, top_y + 2 * sq,
-            cx - 10, top_y + sq
-        ]
-        self.create_polygon(frame_points, outline=self.frame_color, fill=self.glass_color, width=2, tags="glass")
-# Верхній пісок
-        self.upper_sand = self.create_polygon(0, 0, 0, 0, 0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+        # Верхній та нижні овали 
+        self.create_oval(cx - half_sq, top_y - disk_height // 2,  
+                         cx + half_sq, top_y + disk_height // 2,  
+                         fill="#6E3C17", outline="#4F2D11", width=2)  
 
-        # Нижній пісок
-        self.lower_sand = self.create_polygon(0, 0, 0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+        self.create_oval(cx - half_sq, top_y + height - disk_height // 2,  
+                         cx + half_sq, top_y + height + disk_height // 2,  
+                         fill="#6E3C17", outline="#4F2D11", width=2)  
 
-        # Сипучий пісок (струмінь)
-        self.falling_sand = self.create_rectangle(0, 0, 0, 0, fill=self.sand_color, outline="", tags="sand")
+        # Стовпчики  
+        post_width = 4  
+        post_offset = half_sq - 5  
+        self.create_line(cx - post_offset, top_y + disk_height // 2,  
+                         cx - post_offset, top_y + height - disk_height // 2,  
+                         fill="#3B0E05", width=post_width)  
+        self.create_line(cx + post_offset, top_y + disk_height // 2,  
+                         cx + post_offset, top_y + height - disk_height // 2,  
+                         fill="#3B0E05", width=post_width)  
 
-    def _animate_sand(self):
-        if self.is_running:
-            elapsed = time.time() - self.start_time
-            if elapsed < self.duration:
-                self.sand_level = 1 - (elapsed / self.duration)  # Відлік назад
-                self._update_sand_display()
-                self.timer_id = self.after(50, self._animate_sand)
-            else:
-                self.sand_level = 0.0
-                self._update_sand_display()
-                self.is_running = False
-                print("Час вичерпано!")
-                self.flip()
+        # Скляна посудина  
+        self.create_polygon(  
+            cx - half_sq + 10, top_y + disk_height,  
+            cx + half_sq - 10, top_y + disk_height,  
+            cx + 5, top_y + sq,  
+            cx + half_sq - 10, top_y + height - disk_height,  
+            cx - half_sq + 10, top_y + height - disk_height,  
+            cx - 5, top_y + sq,  
+            fill=self.glass_color, outline="#ADD8E6", width=1.5, smooth=True  
+        )  
 
-def _update_sand_display(self):
-        cx, top_y, sq = self._calculate_coordinates()
-        padding = 10
-        max_height = sq - 2 * padding
-        width_factor = sq // 2 - padding
+        # Мітки для піску  
+        self.upper_sand = None  
+        self.lower_sand = None  
+        self.falling_sand = None  
 
-        # Верхній пісок (звужується донизу)
+    def _animate_sand(self):  
+        if self.is_running:  
+            elapsed = time.time() - self.start_time  
+            if elapsed < self.duration:  
+                self.sand_level = 1 - (elapsed / self.duration)  
+                self._update_sand_display()  
+                self.timer_id = self.after(50, self._animate_sand)  
+            else:  
+                self.sand_level = 0.0  
+                self._update_sand_display()  
+                self.is_running = False  
+                print("Час вичерпано!")  
+
+    #Розташування верхнього й нажнього піску
+    def _update_sand_display(self): 
+        cx, top_y, sq = self._calculate_coordinates()  
+        padding = 16 # збільшений відступ щоб не виходило за скло  
+        max_height = sq - 4  * padding
+        width_factor = sq // 3.5 - padding 
+
         remaining = self.sand_level
-        upper_height = int(remaining * max_height)
-        top_base = int(width_factor * remaining)
-        self.coords(self.upper_sand,
-                    cx - top_base, top_y + padding,
-                    cx + top_base, top_y + padding,
-                    cx + 2, top_y + padding + upper_height,
-                    cx - 2, top_y + padding + upper_height)
+        upper_height = remaining * max_height
+        lower_height = (1 - remaining) * max_height
+        top_base = width_factor * remaining
+        bottom_base = width_factor * (1 - remaining)
+        bottom_y = top_y + 2 * sq - padding
 
-        # Нижній пісок (наростає як купка)
-        lower_height = int((1 - self.sand_level) * max_height)
-        base = int(width_factor * (1 - self.sand_level))
-        bottom = top_y + 2 * sq - padding
-        self.coords(self.lower_sand,
-                    cx - base, bottom,
-                    cx + base, bottom,
-                    cx, bottom - lower_height)
+        # Очистка старого піску
+        self.delete("sand")
 
-        # Сипучий пісок (струмінь)
+        # Верхній пісок 
+        if remaining > 0.01:
+            radius = top_base
+            self.create_arc(
+                cx - radius, top_y + padding - radius,
+                cx + radius, top_y + padding + radius,
+                start=180, extent=180, fill=self.sand_color, outline="", tags="sand"
+            )
+            self.create_polygon(
+                cx - top_base, top_y + padding,
+                cx + top_base, top_y + padding,
+                cx + 2, top_y + padding + upper_height,
+                cx - 2, top_y + padding + upper_height,
+                fill=self.sand_color, outline="", tags="sand"
+            )
+
+        # Нижній пісок 
+        if remaining < 0.99:
+            radius = bottom_base
+            self.create_arc(
+                cx - radius, bottom_y - radius,
+                cx + radius, bottom_y + radius,
+                start=0, extent=180, fill=self.sand_color, outline="", tags="sand"
+            )
+            self.create_polygon(
+                cx - bottom_base, bottom_y,
+                cx + bottom_base, bottom_y,
+                cx + 2, bottom_y - lower_height,
+                cx - 2, bottom_y - lower_height,
+                fill=self.sand_color, outline="", tags="sand"
+            )
+
+        # Сипучий пісок
         if 0 < self.sand_level < 1.0:
             top_sand_y = top_y + padding + upper_height
-            bottom_sand_y = bottom - lower_height
-            self.coords(self.falling_sand,
-                        cx - 1, top_sand_y,
-                        cx + 1, bottom_sand_y)
-            self.itemconfigure(self.falling_sand, state='normal')
-        else:
-            self.itemconfigure(self.falling_sand, state='hidden')
+            bottom_sand_y = bottom_y - lower_height
+            self.create_rectangle(
+                cx - 1, top_sand_y, cx + 1, bottom_sand_y,
+                fill=self.sand_color, outline="", tags="sand"
+            )
 
-    def start(self):
-        if not self.is_running:
-            self.is_running = True
-            self.start_time = time.time()
-            self._animate_sand()
+    def start(self):  
+        if not self.is_running:  
+            self.is_running = True  
+            self.start_time = time.time()  
+            self._animate_sand()  
 
-    def reset(self):
-        self.is_running = False
-        if self.timer_id is not None:
-            self.after_cancel(self.timer_id)
-            self.timer_id = None
-        self.sand_level = 1.0
-        self._update_sand_display()
+    def reset(self):  
+        self.is_running = False  
+        if self.timer_id is not None:  
+            self.after_cancel(self.timer_id)  
+            self.timer_id = None  
+        self.sand_level = 1.0  
+        self._update_sand_display()  
 
-    def set_duration(self, new_duration):
-        try:
-            self.duration = int(new_duration)
-            if self.is_running:
-                self.reset()
-                self.start()
-        except ValueError:
-            print("Будь ласка, введіть ціле число для тривалості.")
+    def set_duration(self, new_duration):  
+        try:  
+            self.duration = int(new_duration)  
+            if self.is_running:  
+                self.reset()  
+                self.start()  
+        except ValueError:  
+            print("Будь ласка, введіть ціле число для тривалості.")  
 
-    def _on_resize(self, event):
-        self._create_sand_clock()
-        self._update_sand_display()
+    def _on_resize(self, event):  
+        self._create_sand_clock()  
+        self._update_sand_display()  
 
-    def flip(self):
-        """Перевертає пісочний годинник і починає новий відлік"""
-        self.reset()  # Скидаємо рівень піску
-        time.sleep(1)  # Додаємо невеликий затримку перед перевертанням
-        self.is_running = True
-        self.start_time = time.time()  # Перезапускаємо відлік
-        print("Перевернуто!")
+def main():  
+    window = tk.Tk()  
+    window.title("Пісочний годинник")  
 
-def main():
-    window = tk.Tk()
-    window.title("Пісочний годинник")
+    sand_clock = SandClock(window, duration=30)  
+    sand_clock.pack(pady=10, expand=True, fill=tk.BOTH)  
 
-    sand_clock = SandClock(window, duration=60)
-    sand_clock.pack(pady=10, expand=True, fill=tk.BOTH)
-    sand_clock.start()  # Автоматичний запуск таймера
+    button_frame = tk.Frame(window)  
+    button_frame.pack()  
 
-    button_frame = tk.Frame(window)
-    button_frame.pack()
+    def start_timer():  
+        sand_clock.start()  
 
-    start_button = tk.Button(button_frame, text="Старт", command=sand_clock.start)
-    start_button.pack(side=tk.LEFT, padx=5)
+    start_button = tk.Button(button_frame, text="Старт", command=start_timer)  
+    start_button.pack(side=tk.LEFT, padx=5)  
 
-    reset_button = tk.Button(button_frame, text="Скинути", command=sand_clock.reset)
-    reset_button.pack(side=tk.LEFT, padx=5)
+    reset_button = tk.Button(button_frame, text="Скинути", command=sand_clock.reset)  
+    reset_button.pack(side=tk.LEFT, padx=5)  
 
-    duration_frame = tk.Frame(window)
-    duration_frame.pack(pady=5)
-    duration_label = tk.Label(duration_frame, text="Час (сек):")
-    duration_label.pack(side=tk.LEFT)
-    duration_entry = tk.Entry(duration_frame, width=5)
-    duration_entry.insert(0, "60")
-    duration_entry.pack(side=tk.LEFT)
+    duration_frame = tk.Frame(window)  
+    duration_frame.pack(pady=5)  
+    duration_label = tk.Label(duration_frame, text="Час (сек):")  
+    duration_label.pack(side=tk.LEFT)  
+    duration_entry = tk.Entry(duration_frame, width=5)  
+    duration_entry.insert(0, "30")  
+    duration_entry.pack(side=tk.LEFT)  
 
-    set_duration_button = tk.Button(duration_frame, text="Встановити",
-                                    command=lambda: sand_clock.set_duration(duration_entry.get()))
-    set_duration_button.pack(side=tk.LEFT, padx=5)
+    def set_duration():  
+        sand_clock.set_duration(duration_entry.get())  
 
-    window.mainloop()
+    set_duration_button = tk.Button(duration_frame, text="Встановити", command=set_duration)  
+    set_duration_button.pack(side=tk.LEFT, padx=5)  
 
-if __name__ == "__main__":
+    window.mainloop()  
+
+if __name__ == "__main__":  
     main()
